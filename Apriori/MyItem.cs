@@ -21,10 +21,5 @@ namespace Apriori
                 return false;
             return (((MyItem)item).Id == Id);
         }
-
-        public void print()
-        {
-            Console.WriteLine(Id);
-        }
     }
 }

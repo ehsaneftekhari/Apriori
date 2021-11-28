@@ -10,6 +10,5 @@ namespace Apriori
     {
         string InString { get; }
         bool IsEqual(IItem item);
-        void print();
     }
 }
