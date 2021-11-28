@@ -106,7 +106,6 @@ namespace Apriori
                 if (!set.Contains(Element))
                     return false;
 
-
             return true;
         }
         public void Print()
