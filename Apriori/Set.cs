@@ -18,9 +18,11 @@ namespace Apriori
             get
             {
                 string str = "{";
-                foreach (T t in ElementsList)
+                for(int i = 0; i < ElementsList.Count; i++)
                 {
-                    str += t.InString+", ";
+                    str += ElementsList.ElementAt(i).InString;
+                    if (i < ElementsList.Count - 1)
+                        str += ", ";
                 }
                 str += "}";
                 return str;

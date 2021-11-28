@@ -21,6 +21,5 @@ namespace Apriori
         {
             this.transactions.Add(transaction);
         }
-        
     }
 }
