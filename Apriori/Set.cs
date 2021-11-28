@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace Apriori
 {
-    class Set<T> where T : IItem
+    class Set<T> : IEnumerable, IEnumerator where T : IItem
     {
         private List<T> ElementsList;
+        int position = -1;
         int Count
         {
             get
@@ -35,6 +37,26 @@ namespace Apriori
                 return str;
             }
         }
+
+        //IEnumerator
+        public object Current { get { return this[position]; } }
+        public bool MoveNext()
+        {
+            position++;
+            return (position < Count);
+        }
+        public void Reset()
+        {
+            position = -1;
+        }
+        //IEnumerator End
+
+        //IEnumerable
+        public IEnumerator GetEnumerator()
+        {
+            return (IEnumerator)this;
+        }
+        //IEnumerable End
 
         public Set()
         {
@@ -65,11 +87,11 @@ namespace Apriori
         {
             if (set == null)
                 return true;
-            for (int i = 0; i < set.Count; i++)
-                if (!Contains(set[i]))
-                {
+
+            foreach (T Element in set)
+                if (!Contains(Element))
                     return false;
-                }
+
             return true;
         }
         public bool IsSubSetOf(Set<T> set)
@@ -80,11 +102,11 @@ namespace Apriori
                 else
                     return false;
 
-            for (int i = 0; i < Count; i++)
-                if (!set.Contains(this[i]))
-                {
+            foreach (T Element in ElementsList)
+                if (!set.Contains(Element))
                     return false;
-                }
+
+
             return true;
         }
         public void Print()
