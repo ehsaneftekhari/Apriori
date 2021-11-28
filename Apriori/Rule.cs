@@ -8,7 +8,15 @@ namespace Apriori
 {
     class Rule<T> where T : IItem
     {
-        Set<T> Assumption { get; set;}
-        Set<T> result { get; set;}
+        Set<T> Assumption { get; set; }
+        Set<T> result { get; set; }
+
+        public string InString
+        {
+            get
+            {
+                return Assumption.InString +" -> "+ result.InString;
+            }
+        }
     }
 }
