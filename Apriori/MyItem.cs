@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Apriori
 {
-    class MyItem : IItem
+    class MyItem : IItem, ICloneable<MyItem>
     {
         public string Id { get; set; }
 
@@ -17,9 +17,21 @@ namespace Apriori
         {
             if (item == null)
                 return false;
-            if(!(item is MyItem))
+            if (!(item is MyItem))
                 return false;
             return (((MyItem)item).Id == Id);
         }
+
+        public MyItem Clone()
+        {
+            return new MyItem(String.Copy(Id));
+        }
+        public bool IsEqual(MyItem other)
+        {
+            if (other == null) return false;
+            if (other.Id != Id) return false;
+            return true;
+        }
+
     }
 }

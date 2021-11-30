@@ -7,10 +7,14 @@ using System.Threading.Tasks;
 
 namespace Apriori
 {
-    class Set<T> : IEnumerable, IEnumerator where T : IItem
+    class Set<T> : IEnumerable, IEnumerator, ICloneable<Set<T>> where T : IItem, ICloneable<T>
     {
         private List<T> ElementsList;
         int position = -1;
+        public IEnumerable<T> Elements
+        {
+            get { return ElementsList; }
+        }
         int Count
         {
             get
@@ -38,6 +42,19 @@ namespace Apriori
             }
         }
 
+        public Set()
+        {
+            ElementsList = new List<T>();
+        }
+        public Set(T Element) : this()
+        {
+            Add(Element);
+        }
+        public Set(IEnumerable<T> Elements) : this()
+        {
+            AddRange(Elements);
+        }
+
         //IEnumerator
         public object Current { get { return this[position]; } }
         public bool MoveNext()
@@ -58,26 +75,41 @@ namespace Apriori
         }
         //IEnumerable End
 
-        public Set()
+        //ICloneable<T>
+        public Set<T> Clone()
         {
-            ElementsList = new List<T>();
+            return new Set<T>(ElementsList);
         }
-        public Set(T Element) : this()
+        public bool IsEqual(Set<T> other)
         {
-            ElementsList.Add(Element);
+            if(other.Count != Count)
+                return false;
+
+            foreach(T Element in other)
+                if(ElementsList.FirstOrDefault(x => x.IsEqual(Element)) == null)
+                    return false;
+
+            return true;
         }
-        public Set(IEnumerable<T> Elements) : this()
+        //ICloneable<T> End
+
+        public void AddRange(IEnumerable<T> Elements)
         {
             foreach (T Element in Elements)
             {
-                if (!ElementsList.Contains(Element))
-                    ElementsList.Add(Element);
+                Add(Element);
             }
         }
-        public void AddElement(T Element)
+        public void Add(T Element)
         {
-            if (!ElementsList.Contains(Element))
-                ElementsList.Add(Element);
+            if (ElementsList.FirstOrDefault<T>(x => x.IsEqual(Element)) != null)
+                ElementsList.Add(Element.Clone());
+        }
+        public static Set<T> Merge(Set<T> set1, Set<T> set2)
+        {
+            Set<T> merged = set1.Clone();
+            merged.AddRange(set2.Elements);
+            return merged;
         }
         public bool Contains(T Element)
         {
@@ -112,5 +144,7 @@ namespace Apriori
         {
             Console.WriteLine(InString);
         }
+
+        
     }
 }

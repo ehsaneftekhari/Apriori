@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Apriori
 {
-    class Transaction<T> where T : IItem
+    class Transaction<T> where T : IItem, ICloneable<T>
     {
         private List<T> itemsList;
         public T this[int i]

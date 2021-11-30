@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Apriori
 {
-    class Rule<T> where T : IItem
+    class Rule<T> : ICloneable<Rule<T>> where T : IItem, ICloneable<T>
     {
         Set<T> Assumption { get; set; }
         Set<T> result { get; set; }
@@ -17,6 +17,16 @@ namespace Apriori
             {
                 return Assumption.InString +" -> "+ result.InString;
             }
+        }
+
+        public Rule<T> Clone()
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool IsEqual(Rule<T> other)
+        {
+            throw new NotImplementedException();
         }
     }
 }

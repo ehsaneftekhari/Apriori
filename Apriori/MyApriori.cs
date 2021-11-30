@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Apriori
 {
-    class MyApriori<T> where T : IItem
+    class MyApriori<T> where T : IItem, ICloneable<T>
     {
         List<Transaction<T>> transactions { get; }
         public MyApriori()
