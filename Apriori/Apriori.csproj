@@ -43,6 +43,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ICloneable.cs" />
     <Compile Include="Rule.cs" />
     <Compile Include="Set.cs" />
     <Compile Include="Item.cs" />
