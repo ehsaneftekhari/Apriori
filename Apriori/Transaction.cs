@@ -12,7 +12,16 @@ namespace Apriori
         private List<T> itemsList;
         public T this[int i]
         {
-            get { return itemsList.ElementAt(i); }
+            get { return itemsList.ElementAt(i).Clone(); }
+        }
+        public IEnumerable<T> Items
+        {
+            get
+            {
+                List<T> temp = new List<T>();
+                foreach (T item in itemsList) temp.Add(item.Clone());
+                return temp;
+            }
         }
         public string InString
         {
