@@ -19,14 +19,24 @@ namespace Apriori
             }
         }
 
+        public Rule(Set<T> Assumption, Set<T> result)
+        {
+            this.Assumption = Assumption.Clone();
+            this.result = result.Clone();
+        }
+
         public Rule<T> Clone()
         {
-            throw new NotImplementedException();
+            return new Rule<T>(Assumption, result);
         }
 
         public bool IsEqual(Rule<T> other)
         {
-            throw new NotImplementedException();
+            if(other == null)
+                return false;
+            if(!other.Assumption.IsEqual(Assumption) || !result.IsEqual(other.result))
+                return false;
+            return true;
         }
     }
 }
