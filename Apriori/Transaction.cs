@@ -55,6 +55,17 @@ namespace Apriori
         {
             itemsList.Add(Item);
         }
+        public bool Contains(Set<T> set)
+        {
+            if(set == null)
+                return false;
+
+            foreach (T Element in set)
+                if(itemsList.FirstOrDefault(x => x.IsEqual(Element)) == null)
+                    return false;
+
+            return true;
+        }
         public void Print()
         {
             Console.WriteLine(InString);
