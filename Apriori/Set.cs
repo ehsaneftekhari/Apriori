@@ -13,7 +13,12 @@ namespace Apriori
         int position = -1;
         public IEnumerable<T> Elements
         {
-            get { return ElementsList; }
+            get
+            {
+                List<T> temp = new List<T>();
+                foreach (T element in ElementsList) temp.Add(element.Clone());
+                return temp;
+            }
         }
         int Count
         {
@@ -82,11 +87,11 @@ namespace Apriori
         }
         public bool IsEqual(Set<T> other)
         {
-            if(other.Count != Count)
+            if (other.Count != Count)
                 return false;
 
-            foreach(T Element in other)
-                if(ElementsList.FirstOrDefault(x => x.IsEqual(Element)) == null)
+            foreach (T Element in other)
+                if (ElementsList.FirstOrDefault(x => x.IsEqual(Element)) == null)
                     return false;
 
             return true;
@@ -145,6 +150,6 @@ namespace Apriori
             Console.WriteLine(InString);
         }
 
-        
+
     }
 }
