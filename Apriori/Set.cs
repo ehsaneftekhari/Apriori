@@ -107,11 +107,11 @@ namespace Apriori
         }
         public bool Add(T Element)
         {
-            if (ElementsList.FirstOrDefault<T>(x => x.IsEqual(Element)) != null)
+            if (ElementsList.FirstOrDefault<T>(x => x.IsEqual(Element)) == null)
             {
                 ElementsList.Add(Element.Clone());
                 return true;
-            }  
+            }
             return false;
         }
         public static Set<T> Merge(Set<T> set1, Set<T> set2)
@@ -149,11 +149,69 @@ namespace Apriori
 
             return true;
         }
+        public IEnumerable<Set<T>> SubSets()
+        {
+            List<Set<T>> List = new List<Set<T>>();
+            for (int i = 0; i < Math.Pow(ElementsList.Count, 2); i++)
+            {
+                List.Add(GenerateSubset(Binary_Subset_Generator(i)));
+            }
+            return List;
+        }
+        private bool[] Binary_Subset_Generator(int subset_number)
+        {
+            bool[] Map = new bool[ElementsList.Count];
+            for (int i = 0; subset_number > 0; i++)
+            {
+                try
+                {
+                    if (subset_number % 2 == 1)
+                        Map[i] = true;
+                    else
+                        Map[i] = false;
+
+                    subset_number /= 2;
+                }
+                catch (IndexOutOfRangeException ex)
+                {
+                    throw ex;
+                }
+            }
+            return Map;
+        }
+        private Set<T> GenerateSubset(bool[] Map)
+        {
+            Set<T> subsetSet = new Set<T>();
+            for (int i = 0; i < Map.Length; i++)
+            {
+                if (Map[i])
+                    subsetSet.Add(ElementsList.ElementAt(i));
+            }
+            return subsetSet;
+        }
+        public void SubtractionBy(Set<T> Secound)
+        {
+            foreach (T element in Secound)
+                ((List<T>)Elements).RemoveAll(x => x.IsEqual(element));
+        }
+        public Set<T> Subtraction(Set<T> Secound)
+        {
+            return Subtraction(this, Secound);
+        }
+        public Set<T> Subtraction(Set<T> first, Set<T> Secound)
+        {
+            Set<T> ans = first.Clone();
+
+            if (Secound == null) return ans;
+
+            foreach (T element in Secound)
+                ((List<T>)ans.Elements).RemoveAll(x => x.IsEqual(element));
+            return ans;
+        }
         public void Print()
         {
             Console.WriteLine(InString);
         }
-
 
     }
 }
