@@ -105,10 +105,14 @@ namespace Apriori
                 Add(Element);
             }
         }
-        public void Add(T Element)
+        public bool Add(T Element)
         {
             if (ElementsList.FirstOrDefault<T>(x => x.IsEqual(Element)) != null)
+            {
                 ElementsList.Add(Element.Clone());
+                return true;
+            }  
+            return false;
         }
         public static Set<T> Merge(Set<T> set1, Set<T> set2)
         {
