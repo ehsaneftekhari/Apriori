@@ -20,7 +20,7 @@ namespace Apriori
                 return temp;
             }
         }
-        int Count
+        public int Count
         {
             get
             {
@@ -61,7 +61,10 @@ namespace Apriori
         }
 
         //IEnumerator
-        public object Current { get { return this[position]; } }
+        public object Current
+        {
+            get { return this[position]; }
+        }
         public bool MoveNext()
         {
             position++;
@@ -124,12 +127,12 @@ namespace Apriori
         {
             return ElementsList.Contains(Element);
         }
-        public bool HaveSubSet(Set<T> set)
+        public bool ContainsSubset(Set<T> subset)
         {
-            if (set == null)
+            if (subset == null)
                 return true;
 
-            foreach (T Element in set)
+            foreach (T Element in subset)
                 if (!Contains(Element))
                     return false;
 
