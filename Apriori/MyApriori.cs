@@ -8,11 +8,11 @@ namespace Apriori
 {
     class MyApriori<T> where T : IItem, ICloneable<T>
     {
-        List<Transaction<T>> transactions { get; }
+        public List<Transaction<T>> transactions { get; }
         Set<T> items { get; set; }
-        List<List<Set<T>>> FrequentSets { get; }
-        List<Set<T>> InFrequentSets { get; }
-        List<Rule<T>> Rules { get; }
+        public List<List<Set<T>>> FrequentSets { get; }
+        public List<Set<T>> InFrequentSets { get; }
+        public List<Rule<T>> Rules { get;}
         public double MinSupport { get; set; }
         public double MinConfident { get; set; }
 
@@ -22,6 +22,7 @@ namespace Apriori
             transactions = new List<Transaction<T>>();
             FrequentSets = new List<List<Set<T>>>();
             InFrequentSets = new List<Set<T>>();
+            Rules = new List<Rule<T>>();
         }
         public MyApriori(IEnumerable<Transaction<T>> transactions) : this()
         {
@@ -46,7 +47,7 @@ namespace Apriori
             AddItems(transaction.Items);
         }
 
-        private double GetSupportOf(Set<T> set)
+        public double GetSupportOf(Set<T> set)
         {
             double count = 0;
             foreach (Transaction<T> transaction in transactions)
@@ -55,7 +56,7 @@ namespace Apriori
             return count / transactions.Count;
         }
 
-        private bool CheckSupport(Set<T> set)
+        public bool CheckSupport(Set<T> set)
         {
             for(int i = 0; i < InFrequentSets.Count; i++)
             {
@@ -69,7 +70,7 @@ namespace Apriori
             return support >= MinSupport;
         }
 
-        private double GetConfidentOf(Rule<T> rule)
+        public double GetConfidentOf(Rule<T> rule)
         {
             double count1 = 0;
             double count2 = 0;
@@ -84,15 +85,16 @@ namespace Apriori
             return count2 / count1;
         }
 
-        private bool CheckConfident(Rule<T> rule)
+        public bool CheckConfident(Rule<T> rule)
         {
             double confident = GetConfidentOf(rule);
             return confident >= MinConfident;
         }
 
-        public IEnumerable<Rule<T>> Process()
+        public void Process()
         {
             int count = 0;
+            //Generating single Element Frequent Sets
             FrequentSets.Add(new List<Set<T>>());
             foreach (T item in items)
             {
@@ -105,19 +107,19 @@ namespace Apriori
                 else
                     InFrequentSets.Add(ChallengedSet);
             }
-            ///
+            //Generating other Frequent Sets
             for (int i = 2; count >= 1; i++)
             {
                 count = 0;
                 FrequentSets.Add(new List<Set<T>>());
                 for (int j = 0; j < FrequentSets.ElementAt(0).Count; j++)
                 {
-                    Set<T> SengleSet = FrequentSets.ElementAt(0).ElementAt(j);
+                    Set<T> SingleSet = FrequentSets.ElementAt(0).ElementAt(j);
                     for (int k = 0; k < FrequentSets.ElementAt(i - 2).Count; k++)
                     {
                         Set<T> item = FrequentSets.ElementAt(i - 2).ElementAt(k);
 
-                        Set<T> ChallengedSet = Set<T>.Merge(item, SengleSet);
+                        Set<T> ChallengedSet = Set<T>.Merge(item, SingleSet);
                         if (ChallengedSet.Count == i && (FrequentSets.ElementAt(i - 1).FirstOrDefault(x => x.HasSubset(ChallengedSet)) == null))
                             if (CheckSupport(ChallengedSet))
                             {
@@ -129,10 +131,28 @@ namespace Apriori
                     }
                 }
             }
-            ///
-
-
-            return null;
+            //Generating Rules
+            foreach (List<Set<T>> FrequentSet_Level_List in FrequentSets)
+            {
+                foreach (Set<T> FrequentSet in FrequentSet_Level_List)
+                {
+                    if (FrequentSet.Count > 1)
+                    {
+                        List<Set<T>> SubSets = new List<Set<T>>(FrequentSet.SubSets());
+                        SubSets.RemoveAll(x => x.IsEmpty);
+                        SubSets.RemoveAll(x => x.IsEqual(FrequentSet));
+                        foreach(Set<T> set in SubSets)
+                        {
+                            Set<T> Assumption = FrequentSet.Subtraction(set);
+                            Set<T> Result = FrequentSet.Subtraction(Assumption);
+                            Rule<T> ChallengedRule = new Rule<T>(Assumption, Result);
+                            if(CheckConfident(ChallengedRule))
+                                Rules.Add(ChallengedRule);
+                        }
+                    } 
+                }
+            }
+            // End
         }
     }
 }
