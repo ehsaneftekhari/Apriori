@@ -47,7 +47,10 @@ namespace Apriori
                 return str;
             }
         }
-
+        public bool IsEmpty
+        {
+            get => ElementsList.Count == 0;
+        }
         public Set()
         {
             ElementsList = new List<T>();
