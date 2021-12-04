@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Apriori
 {
     class Set<T> : IEnumerable, IEnumerator, ICloneable<Set<T>> where T : IItem, ICloneable<T>
     {
         private List<T> ElementsList;
-        int position = -1;
+        public int position = -1;
         public IEnumerable<T> Elements
         {
             get
@@ -117,24 +118,57 @@ namespace Apriori
             }
             return false;
         }
+        public void MergeBy(Set<T> set)
+        {
+            AddRange(set.Elements);
+        }
+        public Set<T> Merge(Set<T> set)
+        {
+            return Merge(this,set);
+        }
         public static Set<T> Merge(Set<T> set1, Set<T> set2)
         {
             Set<T> merged = set1.Clone();
             merged.AddRange(set2.Elements);
             return merged;
         }
+        public void SubtractionBy(Set<T> Secound)
+        {
+            foreach (T element in Secound)
+                ((List<T>)Elements).RemoveAll(x => x.IsEqual(element));
+        }
+        public Set<T> Subtraction(Set<T> Secound)
+        {
+            return Subtraction(this, Secound);
+        }
+        public static Set<T> Subtraction(Set<T> first, Set<T> Secound)
+        {
+            Set<T> ans = first.Clone();
+
+            if (Secound == null) return ans;
+
+            foreach (T element in Secound)
+                ((List<T>)ans.Elements).RemoveAll(x => x.IsEqual(element));
+            return ans;
+        }
         public bool Contains(T Element)
         {
-            return ElementsList.Contains(Element);
+            return ElementsList.FirstOrDefault(x => x.IsEqual(Element)) != null;
         }
-        public bool ContainsSubset(Set<T> subset)
+        public bool HasSubset(Set<T> subset)
         {
             if (subset == null)
                 return true;
 
-            foreach (T Element in subset)
-                if (!Contains(Element))
+            //foreach (T Element in subset)
+            //    if (!Contains(Element))
+            //        return false;
+            for(int i = 0; i < subset.Count; i++)
+            {
+                T element = subset[i];
+                if (!Contains(element))
                     return false;
+            }
 
             return true;
         }
@@ -191,25 +225,6 @@ namespace Apriori
                     subsetSet.Add(ElementsList.ElementAt(i));
             }
             return subsetSet;
-        }
-        public void SubtractionBy(Set<T> Secound)
-        {
-            foreach (T element in Secound)
-                ((List<T>)Elements).RemoveAll(x => x.IsEqual(element));
-        }
-        public Set<T> Subtraction(Set<T> Secound)
-        {
-            return Subtraction(this, Secound);
-        }
-        public Set<T> Subtraction(Set<T> first, Set<T> Secound)
-        {
-            Set<T> ans = first.Clone();
-
-            if (Secound == null) return ans;
-
-            foreach (T element in Secound)
-                ((List<T>)ans.Elements).RemoveAll(x => x.IsEqual(element));
-            return ans;
         }
         public void Print()
         {
