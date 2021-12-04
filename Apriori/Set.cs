@@ -94,12 +94,18 @@ namespace Apriori
         }
         public bool IsEqual(Set<T> other)
         {
+            if (other == null)
+                return false;
+
             if (other.Count != Count)
                 return false;
 
-            foreach (T Element in other)
-                if (ElementsList.FirstOrDefault(x => x.IsEqual(Element)) == null)
+            for (int i = 0; i < Count; i++)
+            {
+                T element = other[i];
+                if (ElementsList.FirstOrDefault(x => x.IsEqual(element)) == null)
                     return false;
+            }
 
             return true;
         }
@@ -191,12 +197,30 @@ namespace Apriori
         public IEnumerable<Set<T>> SubSets()
         {
             List<Set<T>> List = new List<Set<T>>();
-            for (int i = 0; i < Math.Pow(ElementsList.Count, 2); i++)
+            double lim = Math.Pow(2, ElementsList.Count);
+            for (int i = 0; i < lim; i++)
             {
                 List.Add(GenerateSubset(Binary_Subset_Generator(i)));
             }
             return List;
         }
+        //public bool IsEqual(Set<T> set)
+        //{
+        //    if (set == null)
+        //        return false;
+
+        //    if (set.Count == Count)
+        //        for (int i = 0; i < Count; i++)
+        //        {
+        //            T element = set[i];
+        //            if (ElementsList.FirstOrDefault(x => x.IsEqual(element)) == null)
+        //                return false;
+        //        }
+        //    else
+        //        return false;
+
+        //    return true;
+        //}
         private bool[] Binary_Subset_Generator(int subset_number)
         {
             bool[] Map = new bool[ElementsList.Count];
