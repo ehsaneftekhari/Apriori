@@ -144,21 +144,18 @@ namespace Apriori
         public void SubtractionBy(Set<T> Secound)
         {
             foreach (T element in Secound)
-                ((List<T>)Elements).RemoveAll(x => x.IsEqual(element));
+                ElementsList.RemoveAll(x => x.IsEqual(element));
         }
         public Set<T> Subtraction(Set<T> Secound)
         {
-            return Subtraction(this, Secound);
+            Set<T> ans = this.Clone();
+            if (Secound == null) return ans;
+            ans.SubtractionBy(Secound);
+            return ans;
         }
         public static Set<T> Subtraction(Set<T> first, Set<T> Secound)
-        {
-            Set<T> ans = first.Clone();
-
-            if (Secound == null) return ans;
-
-            foreach (T element in Secound)
-                ((List<T>)ans.Elements).RemoveAll(x => x.IsEqual(element));
-            return ans;
+        {            
+            return first.Subtraction(Secound);
         }
         public bool Contains(T Element)
         {
