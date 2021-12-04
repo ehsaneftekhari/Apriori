@@ -57,10 +57,13 @@ namespace Apriori
 
         private bool CheckSupport(Set<T> set)
         {
-            foreach (Set<T> InFrequentSet in InFrequentSets)
+            for(int i = 0; i < InFrequentSets.Count; i++)
             {
+                Set<T> InFrequentSet = InFrequentSets[i];
                 if (set.HasSubset(InFrequentSet))
+                {
                     return false;
+                }
             }
             double support = GetSupportOf(set);
             return support >= MinSupport;

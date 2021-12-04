@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Apriori
 {
@@ -57,18 +58,19 @@ namespace Apriori
         }
         public bool Contains(Set<T> set)
         {
-            if(set == null)
+            if (set == null)
                 return false;
 
-            int p = set.position;
-            set.Reset();
-            foreach (T Element in set)
+            if (set.Count > itemsList.Count)
+                return false;
+
+            for (int i = 0; i < set.Count; i++)
             {
+                T Element = set[i];
                 T Temp = itemsList.FirstOrDefault(x => x.IsEqual(Element));
                 if (Temp == null)
                     return false;
             }
-            set.position = p;
             return true;
         }
         public void Print()

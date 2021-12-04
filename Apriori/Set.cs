@@ -124,7 +124,7 @@ namespace Apriori
         }
         public Set<T> Merge(Set<T> set)
         {
-            return Merge(this,set);
+            return Merge(this, set);
         }
         public static Set<T> Merge(Set<T> set1, Set<T> set2)
         {
@@ -160,10 +160,7 @@ namespace Apriori
             if (subset == null)
                 return true;
 
-            //foreach (T Element in subset)
-            //    if (!Contains(Element))
-            //        return false;
-            for(int i = 0; i < subset.Count; i++)
+            for (int i = 0; i < subset.Count; i++)
             {
                 T element = subset[i];
                 if (!Contains(element))
@@ -180,10 +177,12 @@ namespace Apriori
                 else
                     return false;
 
-            foreach (T Element in ElementsList)
+            for (int i = 0; i < ElementsList.Count; i++)
+            {
+                T Element = ElementsList[i];
                 if (!set.Contains(Element))
                     return false;
-
+            }
             return true;
         }
         public IEnumerable<Set<T>> SubSets()
@@ -230,6 +229,5 @@ namespace Apriori
         {
             Console.WriteLine(InString);
         }
-
     }
 }
