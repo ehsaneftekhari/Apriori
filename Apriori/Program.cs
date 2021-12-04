@@ -11,7 +11,9 @@ namespace Apriori
         static void Main(string[] args)
         {
             MyApriori_Test();
+            //SubSet_Test();
         }
+
         static void MyApriori_Test()
         {
             MyItem i1 = new MyItem("i1");
@@ -40,7 +42,44 @@ namespace Apriori
             Ap.AddTransaction(T4);
             Ap.AddTransaction(T5);
             Ap.Process();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Frequent Sets:");
+            Console.ResetColor();
+            foreach (List<Set<MyItem>> FrequentSet_Level_List in Ap.FrequentSets)
+            {
+                foreach (Set<MyItem> set in FrequentSet_Level_List)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("(");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(set.InString);
+
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.Write(" S=" + (Ap.GetSupportOf(set) * 100) + "%");
+
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write(")");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(", ");
+                }
+                Console.WriteLine("\n");
+            }
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Rules:");
+            Console.ResetColor();
+            foreach (Rule<MyItem> rule in Ap.Rules)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(rule.InString);
+
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine(" C=" + (Ap.GetConfidentOf(rule) * 100) + "%");
+            }
+            Console.ReadLine();
         }
+
         static void SubSet_Test()
         {
             Set<MyItem> set = new Set<MyItem>();
@@ -56,5 +95,7 @@ namespace Apriori
             Console.WriteLine("*");
             Console.ReadLine();
         }
+
+       
     }
 }
