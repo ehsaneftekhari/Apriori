@@ -60,10 +60,15 @@ namespace Apriori
             if(set == null)
                 return false;
 
+            int p = set.position;
+            set.Reset();
             foreach (T Element in set)
-                if(itemsList.FirstOrDefault(x => x.IsEqual(Element)) == null)
+            {
+                T Temp = itemsList.FirstOrDefault(x => x.IsEqual(Element));
+                if (Temp == null)
                     return false;
-
+            }
+            set.position = p;
             return true;
         }
         public void Print()
