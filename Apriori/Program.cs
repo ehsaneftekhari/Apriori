@@ -246,18 +246,33 @@ namespace Apriori
             {
                 Console.Write(Item.InString+", ");
             }
-            Console.WriteLine();
+            Console.WriteLine("\n");
+
 
             Ap.MinSupport = minSupport;
             Ap.MinConfident = minConfident;
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("MinSupport = ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write((minSupport * 100) + "%");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("\tMinConfident = ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write((minConfident * 100)+"%");
+            Console.WriteLine("\n");
+
             Ap.Process();
 
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Frequent Sets:");
-            Console.ResetColor();
 
+            int level = 1;
             foreach (List<Set<MyItem>> FrequentSet_Level_List in Ap.FrequentSetsList)
             {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Level "+ level);
+                level++;
                 foreach (Set<MyItem> set in FrequentSet_Level_List)
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
@@ -275,7 +290,7 @@ namespace Apriori
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write(", ");
                 }
-                Console.WriteLine("\n");
+                Console.WriteLine();
             }
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("RulesList:");
