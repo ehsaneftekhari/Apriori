@@ -154,7 +154,7 @@ namespace Apriori
             string[] lines = File.ReadAllLines(fileAddress);
             List<int> transactionsLines = new List<int>();
             List<int> itemLines = new List<int>();
-            int flag = 0; //0:none 1:Items 2:Transactions 3:MinSupport 4:MinConfident
+            int flag = 0; //0:none 1:ItemsList 2:Transactions 3:MinSupport 4:MinConfident
             for (int i = 0; i < lines.Length; i++)
             {
                 string line = lines[i];
@@ -162,7 +162,7 @@ namespace Apriori
                 {
                     switch (line)
                     {
-                        case "Items":
+                        case "ItemsList":
                             flag = 1;
                             break;
                         case "Transactions":
@@ -231,21 +231,32 @@ namespace Apriori
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Transactions:");
             Console.ResetColor();
-
             foreach (Transaction<MyItem> transaction in transactions)
             {
                 Console.WriteLine(transaction.InString);
             }
             Console.WriteLine();
+
             MyApriori<MyItem> Ap = new MyApriori<MyItem>(transactions, Items);
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("ItemsList:");
+            Console.ResetColor();
+            foreach (MyItem Item in Ap.ItemsList)
+            {
+                Console.Write(Item.InString+", ");
+            }
+            Console.WriteLine();
+
             Ap.MinSupport = minSupport;
             Ap.MinConfident = minConfident;
             Ap.Process();
+
             Console.ForegroundColor = ConsoleColor.Red;
             Console.WriteLine("Frequent Sets:");
             Console.ResetColor();
 
-            foreach (List<Set<MyItem>> FrequentSet_Level_List in Ap.FrequentSets)
+            foreach (List<Set<MyItem>> FrequentSet_Level_List in Ap.FrequentSetsList)
             {
                 foreach (Set<MyItem> set in FrequentSet_Level_List)
                 {
@@ -267,9 +278,9 @@ namespace Apriori
                 Console.WriteLine("\n");
             }
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Rules:");
+            Console.WriteLine("RulesList:");
             Console.ResetColor();
-            foreach (Rule<MyItem> rule in Ap.Rules)
+            foreach (Rule<MyItem> rule in Ap.RulesList)
             {
                 Console.ForegroundColor = ConsoleColor.White;
                 Console.Write(rule.InString);
