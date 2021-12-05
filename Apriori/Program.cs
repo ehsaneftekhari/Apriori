@@ -42,6 +42,221 @@ namespace Apriori
                 Console.Clear();
             }
         }
+        static void ReadFromFileTest()
+        {
+            Set<MyItem> items = new Set<MyItem>();
+            List<Transaction<MyItem>> transactions = new List<Transaction<MyItem>>();
+
+            double MinSupport = 0;
+            double MinConfident = 0;
+            string fileAddress = "";
+            string datafileAddress = "AprioriData.txt";
+            bool f = true;
+
+            if (File.Exists(datafileAddress) && File.ReadAllText(datafileAddress) != "")
+            {
+                fileAddress = File.ReadAllLines(datafileAddress)[0];
+                Console.WriteLine("Use resent file?(press 'y' for yes 'n' for no)\n" + fileAddress);
+                Console.CursorVisible = false;
+                do
+                {
+                    switch (Console.ReadKey().Key)
+                    {
+                        case ConsoleKey.N:
+                            f = false;
+                            fileAddress = "";
+                            break;
+                        case ConsoleKey.Y:
+                            f = false;
+                            break;
+                    }
+                } while (f);
+                f = true;
+                Console.CursorVisible = true;
+            }
+
+            Console.Clear();
+
+            do
+            {
+                if (fileAddress == "")
+                {
+                    Console.WriteLine("Enter new Address:");
+                    fileAddress = Console.ReadLine();
+                }
+                if (File.Exists(fileAddress))
+                {
+                    f = false;
+                }
+                else
+                {
+                    Console.Clear();
+                    Console.WriteLine("file is not exists");
+                    fileAddress = "";
+                }
+            } while (f);
+
+            File.WriteAllText(datafileAddress, fileAddress);
+            string[] lines = File.ReadAllLines(fileAddress);
+
+            List<int> transactionsLines = new List<int>();
+            List<int> itemLines = new List<int>();
+
+            int flag = 0; //0:none 1:ItemsList 2:Transactions 3:MinSupport 4:MinConfident
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+                if (flag == 0)
+                {
+                    switch (line)
+                    {
+                        case "ItemsList":
+                            flag = 1;
+                            break;
+                        case "Transactions":
+                            flag = 2;
+                            break;
+                        case "MinSupport":
+                            flag = 3;
+                            break;
+                        case "MinConfident":
+                            flag = 4;
+                            break;
+                    }
+                }
+                else
+                {
+                    if (line == "_" || line == "")
+                        flag = 0;
+                    else
+                    {
+                        switch (flag)
+                        {
+                            case 1:
+                                itemLines.Add(i);
+                                break;
+                            case 2:
+                                transactionsLines.Add(i);
+                                break;
+                            case 3:
+                                MinSupport = double.Parse(line);
+                                break;
+                            case 4:
+                                MinConfident = double.Parse(line);
+                                break;
+                        }
+                    }
+                }
+            }
+
+            foreach (int lineNumber in itemLines)
+            {
+                string[] Items = lines[lineNumber].Split(new char[] { ',', ' ', '\t' }, options: StringSplitOptions.RemoveEmptyEntries);
+                foreach (string Item in Items)
+                {
+                    items.Add(new MyItem(Item));
+                }
+            }
+
+            foreach (int lineNumber in transactionsLines)
+            {
+                string[] TransactionItems = lines[lineNumber].Split(new char[] { ',', ' ', '\t' }, options: StringSplitOptions.RemoveEmptyEntries);
+                Transaction<MyItem> transaction = new Transaction<MyItem>();
+                foreach (string TransactionItem in TransactionItems)
+                {
+                    transaction.AddItem(new MyItem(TransactionItem));
+                }
+                transactions.Add(transaction);
+            }
+
+            Console.WriteLine();
+
+            MyApriori_Test(transactions, MinSupport, MinConfident, new List<MyItem>(items.Elements));
+        }
+        static void MyApriori_Test(
+            List<Transaction<MyItem>> transactions,
+            double minSupport,
+            double minConfident,
+            List<MyItem> Items = null)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Transactions:");
+            Console.ResetColor();
+            foreach (Transaction<MyItem> transaction in transactions)
+            {
+                Console.WriteLine(transaction.InString);
+            }
+            Console.WriteLine();
+
+            MyApriori<MyItem> Ap = new MyApriori<MyItem>(transactions, Items);
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("ItemsList:");
+            Console.ResetColor();
+            foreach (MyItem Item in Ap.ItemsList)
+            {
+                Console.Write(Item.InString+", ");
+            }
+            Console.WriteLine("\n");
+
+            Ap.MinSupport = minSupport;
+            Ap.MinConfident = minConfident;
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("MinSupport = ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write((minSupport * 100) + "%");
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.Write("\tMinConfident = ");
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write((minConfident * 100)+"%");
+            Console.WriteLine("\n");
+
+            Ap.Process();
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("Frequent Sets:");
+
+            int level = 1;
+            foreach (List<Set<MyItem>> FrequentSet_Level_List in Ap.FrequentSetsList)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Level "+ level);
+                level++;
+                foreach (Set<MyItem> set in FrequentSet_Level_List)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("(");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(set.InString);
+
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.Write(" S=" + (Ap.GetSupportOf(set) * 100) + "%");
+
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write(")");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write(", ");
+                }
+                Console.WriteLine();
+            }
+
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("RulesList:");
+
+            foreach (Rule<MyItem> rule in Ap.RulesList)
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write(rule.InString);
+
+                Console.ForegroundColor = ConsoleColor.DarkGreen;
+                Console.WriteLine(" C=" + (Ap.GetConfidentOf(rule) * 100) + "%");
+            }
+            Console.WriteLine();
+            Console.ResetColor();
+        }
         static void StaticTest1()
         {
             MyItem i1 = new MyItem("i1");
@@ -98,215 +313,6 @@ namespace Apriori
             transactions.Add(new Transaction<MyItem>(new MyItem[] { i7, i3, i5, i10, i11, i20 }));
             MyApriori_Test(transactions, 0.6, 0.6);
         }
-
-        static void ReadFromFileTest()
-        {
-            Set<MyItem> items = new Set<MyItem>();
-            List<Transaction<MyItem>> transactions = new List<Transaction<MyItem>>();
-
-            double MinSupport = 0;
-            double MinConfident = 0;
-            string fileAddress = "";
-            string datafileAddress = "AprioriData.txt";
-            bool f = true;
-            if (File.Exists(datafileAddress) && File.ReadAllText(datafileAddress) != "")
-            {
-                fileAddress = File.ReadAllLines(datafileAddress)[0];
-                Console.WriteLine("Use resent file?(press 'y' for yes 'n' for no)\n" + fileAddress);
-                Console.CursorVisible = false;
-                do
-                {
-                    switch (Console.ReadKey().Key)
-                    {
-                        case ConsoleKey.N:
-                            f = false;
-                            fileAddress = "";
-                            break;
-                        case ConsoleKey.Y:
-                            f = false;
-                            break;
-                    }
-                } while (f);
-                f = true;
-                Console.CursorVisible = true;
-            }
-            Console.Clear();
-            do
-            {
-                if (fileAddress == "")
-                {
-                    Console.WriteLine("Enter new Address:");
-                    fileAddress = Console.ReadLine();
-                }
-                if (File.Exists(fileAddress))
-                {
-                    f = false;
-                }
-                else
-                {
-                    Console.Clear();
-                    Console.WriteLine("file is not exists");
-                    fileAddress = "";
-                }
-            } while (f);
-
-            File.WriteAllText(datafileAddress, fileAddress);
-            string[] lines = File.ReadAllLines(fileAddress);
-            List<int> transactionsLines = new List<int>();
-            List<int> itemLines = new List<int>();
-            int flag = 0; //0:none 1:ItemsList 2:Transactions 3:MinSupport 4:MinConfident
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string line = lines[i];
-                if (flag == 0)
-                {
-                    switch (line)
-                    {
-                        case "ItemsList":
-                            flag = 1;
-                            break;
-                        case "Transactions":
-                            flag = 2;
-                            break;
-                        case "MinSupport":
-                            flag = 3;
-                            break;
-                        case "MinConfident":
-                            flag = 4;
-                            break;
-                    }
-                }
-                else
-                {
-                    if (line == "_" || line == "")
-                        flag = 0;
-                    else
-                    {
-                        switch (flag)
-                        {
-                            case 1:
-                                //items.Add(new MyItem(line.Split(new char[] { ',', ' ' }, options: StringSplitOptions.RemoveEmptyEntries)));
-                                itemLines.Add(i);
-                                break;
-                            case 2:
-                                transactionsLines.Add(i);
-                                break;
-                            case 3:
-                                MinSupport = double.Parse(line);
-                                break;
-                            case 4:
-                                MinConfident = double.Parse(line);
-                                break;
-                        }
-                    }
-                }
-            }
-            foreach (int lineNumber in itemLines)
-            {
-                string[] Items = lines[lineNumber].Split(new char[] { ',', ' ', '\t' }, options: StringSplitOptions.RemoveEmptyEntries);
-                foreach (string Item in Items)
-                {
-                    items.Add(new MyItem(Item));
-                }
-            }
-            foreach (int lineNumber in transactionsLines)
-            {
-                string[] TransactionItems = lines[lineNumber].Split(new char[] { ',', ' ', '\t' }, options: StringSplitOptions.RemoveEmptyEntries);
-                Transaction<MyItem> transaction = new Transaction<MyItem>();
-                foreach (string TransactionItem in TransactionItems)
-                {
-                    transaction.AddItem(new MyItem(TransactionItem));
-                }
-                transactions.Add(transaction);
-            }
-
-            Console.WriteLine();
-
-
-            MyApriori_Test(transactions, MinSupport, MinConfident, new List<MyItem>(items.Elements));
-
-        }
-        static void MyApriori_Test(List<Transaction<MyItem>> transactions, double minSupport, double minConfident, List<MyItem> Items = null)
-        {
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Transactions:");
-            Console.ResetColor();
-            foreach (Transaction<MyItem> transaction in transactions)
-            {
-                Console.WriteLine(transaction.InString);
-            }
-            Console.WriteLine();
-
-            MyApriori<MyItem> Ap = new MyApriori<MyItem>(transactions, Items);
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("ItemsList:");
-            Console.ResetColor();
-            foreach (MyItem Item in Ap.ItemsList)
-            {
-                Console.Write(Item.InString+", ");
-            }
-            Console.WriteLine("\n");
-
-
-            Ap.MinSupport = minSupport;
-            Ap.MinConfident = minConfident;
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("MinSupport = ");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write((minSupport * 100) + "%");
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.Write("\tMinConfident = ");
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write((minConfident * 100)+"%");
-            Console.WriteLine("\n");
-
-            Ap.Process();
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("Frequent Sets:");
-
-            int level = 1;
-            foreach (List<Set<MyItem>> FrequentSet_Level_List in Ap.FrequentSetsList)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("Level "+ level);
-                level++;
-                foreach (Set<MyItem> set in FrequentSet_Level_List)
-                {
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write("(");
-
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(set.InString);
-
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
-                    Console.Write(" S=" + (Ap.GetSupportOf(set) * 100) + "%");
-
-                    Console.ForegroundColor = ConsoleColor.Red;
-                    Console.Write(")");
-
-                    Console.ForegroundColor = ConsoleColor.White;
-                    Console.Write(", ");
-                }
-                Console.WriteLine();
-            }
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("RulesList:");
-            Console.ResetColor();
-            foreach (Rule<MyItem> rule in Ap.RulesList)
-            {
-                Console.ForegroundColor = ConsoleColor.White;
-                Console.Write(rule.InString);
-
-                Console.ForegroundColor = ConsoleColor.DarkGreen;
-                Console.WriteLine(" C=" + (Ap.GetConfidentOf(rule) * 100) + "%");
-            }
-            Console.WriteLine();
-            Console.ResetColor();
-        }
-
         static void SubSet_Test()
         {
             Set<MyItem> set = new Set<MyItem>();
@@ -322,7 +328,5 @@ namespace Apriori
             Console.WriteLine("*");
             Console.ReadLine();
         }
-
-
     }
 }
