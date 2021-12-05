@@ -24,11 +24,13 @@ namespace Apriori
             InFrequentSets = new List<Set<T>>();
             Rules = new List<Rule<T>>();
         }
-        public MyApriori(IEnumerable<Transaction<T>> transactions) : this()
+        public MyApriori(IEnumerable<Transaction<T>> transactions, IEnumerable<T> someItems = null) : this()
         {
             this.transactions.AddRange(transactions);
             foreach (Transaction<T> transaction in transactions)
                 AddItems(transaction.Items);
+            if(someItems != null)
+                AddItems(someItems);
         }
 
         public void AddItems(IEnumerable<T> items)
